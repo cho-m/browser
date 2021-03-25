@@ -60,6 +60,16 @@
     <div class="box">
         <div class="box-content">
             <div class="box-content-row box-content-row-checkbox" appBoxRow>
+                <label for="autoBiometricsPrompt">{{'disableAutoBiometricsPrompt' | i18n}}</label>
+                <input id="autoBiometricsPrompt" type="checkbox" (change)="updateAutoBiometricsPrompt()" 
+                    [(ngModel)]="disableAutoBiometricsPrompt">
+            </div>
+        </div>
+        <div class="box-footer">{{'disableAutoBiometricsPromptDesc' | i18n}}</div>
+    </div>
+    <div class="box">
+        <div class="box-content">
+            <div class="box-content-row box-content-row-checkbox" appBoxRow>
                 <label for="dontShowCards">{{'dontShowCardsCurrentTab' | i18n}}</label>
                 <input id="dontShowCards" type="checkbox" (change)="updateShowCards()" [(ngModel)]="dontShowCards">
             </div>

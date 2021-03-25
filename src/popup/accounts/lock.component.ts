@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { ConstantsService } from 'jslib/services/constants.service';
+
 import { ApiService } from 'jslib/abstractions/api.service';
 import { CryptoService } from 'jslib/abstractions/crypto.service';
 import { EnvironmentService } from 'jslib/abstractions/environment.service';
@@ -20,6 +22,8 @@ import Swal from 'sweetalert2';
     templateUrl: 'lock.component.html',
 })
 export class LockComponent extends BaseLockComponent {
+    private isInitialLockScreen: boolean;
+
     constructor(router: Router, i18nService: I18nService,
         platformUtilsService: PlatformUtilsService, messagingService: MessagingService,
         userService: UserService, cryptoService: CryptoService,
@@ -29,6 +33,7 @@ export class LockComponent extends BaseLockComponent {
         super(router, i18nService, platformUtilsService, messagingService, userService, cryptoService,
             storageService, vaultTimeoutService, environmentService, stateService, apiService);
         this.successRoute = '/tabs/current';
+        this.isInitialLockScreen = (window as any).previousPopupUrl == null;
     }
 
     async ngOnInit() {
@@ -36,6 +41,16 @@ export class LockComponent extends BaseLockComponent {
         window.setTimeout(() => {
             document.getElementById(this.pinLock ? 'pin' : 'masterPassword').focus();
         }, 100);
+
+        const disableAutoBiometricsPrompt = await this.storageService.get<boolean>(
+            ConstantsService.disableAutoBiometricsPromptKey);
+        if (this.biometricLock && !disableAutoBiometricsPrompt && this.isInitialLockScreen) {
+            window.setTimeout(async () => {
+                if (await this.vaultTimeoutService.isLocked()) {
+                    await this.unlockBiometric();
+                }
+            }, 100);
+        }
     }
 
     async unlockBiometric() {
